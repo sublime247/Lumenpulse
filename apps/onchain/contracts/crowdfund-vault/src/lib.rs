@@ -144,15 +144,6 @@ impl CrowdfundVaultContract {
 
         // Transfer tokens from user to contract if they have sufficient balance; otherwise, skip transfer for accounting-only updates
         let contract_address = env.current_contract_address();
-<<<<<<< HEAD
-        token::transfer(
-            &env,
-            &project.token_address,
-            &user,
-            &contract_address,
-            &amount,
-        );
-=======
         let user_balance = token::balance(&env, &project.token_address, &user);
         if user_balance >= amount {
             token::transfer(
@@ -163,7 +154,6 @@ impl CrowdfundVaultContract {
                 &amount,
             );
         }
->>>>>>> 21d676c7a01bfa77e9dc22d84468f44a1f388a43
 
         // Update project balance
         let balance_key = DataKey::ProjectBalance(project_id, project.token_address.clone());
