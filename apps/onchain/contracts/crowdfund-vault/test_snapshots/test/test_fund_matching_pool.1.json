@@ -354,6 +354,18 @@
                         "val": {
                           "u64": "0"
                         }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "Paused"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "bool": false
+                        }
                       }
                     ]
                   }

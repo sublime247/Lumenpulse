@@ -29,6 +29,9 @@ impl CrowdfundVaultContract {
         // Store admin address
         env.storage().instance().set(&DataKey::Admin, &admin);
 
+        // Store Emergency Pause bool
+        env.storage().instance().set(&DataKey::Paused, &false);
+
         // Initialize project ID counter
         env.storage().instance().set(&DataKey::NextProjectId, &0u64);
 
@@ -53,6 +56,11 @@ impl CrowdfundVaultContract {
 
         // Require owner authorization
         owner.require_auth();
+
+        // Check Emergency Pause State
+        if Self::require_not_paused(&env) {
+            return Err(CrowdfundError::ContractPaused);
+        };
 
         // Validate target amount
         if target_amount <= 0 {
@@ -124,6 +132,11 @@ impl CrowdfundVaultContract {
 
         // Require user authorization
         user.require_auth();
+
+        // Check Emergency Pause State
+        if Self::require_not_paused(&env) {
+            return Err(CrowdfundError::ContractPaused);
+        };
 
         // Validate amount
         if amount <= 0 {
@@ -233,6 +246,11 @@ impl CrowdfundVaultContract {
         // Require admin authorization
         admin.require_auth();
 
+        // Check Emergency Pause State
+        if Self::require_not_paused(&env) {
+            return Err(CrowdfundError::ContractPaused);
+        };
+
         // Check if project exists
         if !env
             .storage()
@@ -259,6 +277,11 @@ impl CrowdfundVaultContract {
         if !env.storage().instance().has(&DataKey::Admin) {
             return Err(CrowdfundError::NotInitialized);
         }
+
+        // Check Emergency Pause State
+        if Self::require_not_paused(&env) {
+            return Err(CrowdfundError::ContractPaused);
+        };
 
         // Get project
         let mut project: ProjectData = env
@@ -697,6 +720,91 @@ impl CrowdfundVaultContract {
             .persistent()
             .get(&contributor_count_key)
             .unwrap_or(0))
+    }
+
+    pub fn pause(env: Env, admin: Address) -> Result<bool, CrowdfundError> {
+        // Check if contract is initialized
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .ok_or(CrowdfundError::NotInitialized)?;
+
+        // Verify admin identity
+        if admin != stored_admin {
+            return Err(CrowdfundError::Unauthorized);
+        }
+
+        // Require admin authorization
+        admin.require_auth();
+
+        let is_paused: bool = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Paused)
+            .unwrap_or(false);
+
+        if is_paused == true {
+            return Err(CrowdfundError::ContractPaused);
+        }
+
+        env.storage().instance().set(&DataKey::Paused, &true);
+
+        events::ContractPauseEvent {
+            admin,
+            paused: true,
+            timestamp: env.ledger().timestamp(),
+        }
+        .publish(&env);
+
+        Ok(true)
+    }
+
+    pub fn unpause(env: Env, admin: Address) -> Result<bool, CrowdfundError> {
+        // Check if contract is initialized
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .ok_or(CrowdfundError::NotInitialized)?;
+
+        // Verify admin identity
+        if admin != stored_admin {
+            return Err(CrowdfundError::Unauthorized);
+        }
+
+        // Require admin authorization
+        admin.require_auth();
+
+        let is_paused: bool = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Paused)
+            .unwrap_or(false);
+
+        if is_paused {
+            return Err(CrowdfundError::ContractPaused);
+        }
+
+        env.storage().instance().set(&DataKey::Paused, &false);
+
+        events::ContractUnpauseEvent {
+            admin,
+            paused: false,
+            timestamp: env.ledger().timestamp(),
+        }
+        .publish(&env);
+
+        Ok(true)
+    }
+
+    pub fn require_not_paused(env: &Env) -> bool {
+        let is_paused = env
+            .storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false);
+        return is_paused;
     }
 }
 

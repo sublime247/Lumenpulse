@@ -14,4 +14,5 @@ pub enum CrowdfundError {
     InvalidAmount = 8,
     AlreadyRegistered = 9,
     ContributorNotFound = 10,
+    ContractPaused = 11,
 }

@@ -912,6 +912,18 @@
                         "val": {
                           "u64": "1"
                         }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "Paused"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "bool": false
+                        }
                       }
                     ]
                   }

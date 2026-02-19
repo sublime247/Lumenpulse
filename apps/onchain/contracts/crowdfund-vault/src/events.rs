@@ -58,3 +58,21 @@ pub struct ReputationUpdatedEvent {
     pub old_reputation: i128,
     pub new_reputation: i128,
 }
+
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ContractPauseEvent {
+    #[topic]
+    pub admin: Address,
+    pub paused: bool,
+    pub timestamp: u64,
+}
+
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ContractUnpauseEvent {
+    #[topic]
+    pub admin: Address,
+    pub paused: bool,
+    pub timestamp: u64,
+}

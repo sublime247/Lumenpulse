@@ -14,6 +14,7 @@ pub enum DataKey {
     MatchingPool(Address),          // token_address -> i128
     RegisteredContributor(Address), // Address -> bool
     Reputation(Address),            // Address -> i128
+    Paused,
 }
 
 #[contracttype]

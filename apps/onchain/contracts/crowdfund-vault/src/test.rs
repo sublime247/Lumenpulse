@@ -1170,3 +1170,134 @@ fn test_fund_matching_pool() {
         pool_amount
     );
 }
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #11)")]
+fn test_create_project_pause() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, admin, owner, _, token_client) = setup_test(&env);
+
+    // Initialize contract
+    client.initialize(&admin);
+
+    let _ = client.pause(&admin);
+
+    // Create project
+    let _project_id = client.create_project(
+        &owner,
+        &symbol_short!("TestProj"),
+        &1_000_000,
+        &token_client.address,
+    );
+}
+
+#[test]
+fn test_create_project_pause_unpause() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, admin, owner, _, token_client) = setup_test(&env);
+
+    // Initialize contract
+    client.initialize(&admin);
+
+    let _ = client.pause(&admin);
+
+    let is_pause = client.require_not_paused();
+    assert_eq!(is_pause, true);
+
+    let _ = client.unpause(&admin);
+
+    let is_pause = client.require_not_paused();
+    assert_eq!(is_pause, false);
+
+    // Create project
+    let project_id = client.create_project(
+        &owner,
+        &symbol_short!("TestProj"),
+        &1_000_000,
+        &token_client.address,
+    );
+
+    assert_eq!(project_id, 0);
+
+    // Verify project data
+    let project = client.get_project(&project_id);
+    assert_eq!(project.id, 0);
+    assert_eq!(project.owner, owner);
+    assert_eq!(project.target_amount, 1_000_000);
+    assert_eq!(project.total_deposited, 0);
+    assert_eq!(project.total_withdrawn, 0);
+    assert!(project.is_active);
+
+    let is_pause = client.require_not_paused();
+    assert_eq!(is_pause, false);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #11)")]
+fn test_deposit_pause() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, admin, owner, user, token_client) = setup_test(&env);
+
+    // Initialize contract
+    client.initialize(&admin);
+
+    // Create project
+    let project_id = client.create_project(
+        &owner,
+        &symbol_short!("TestProj"),
+        &1_000_000,
+        &token_client.address,
+    );
+
+    let _ = client.pause(&admin);
+
+    // Deposit funds
+    let deposit_amount: i128 = 500_000;
+    client.deposit(&user, &project_id, &deposit_amount);
+}
+
+#[test]
+fn test_deposit_pause_unpause() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, admin, owner, user, token_client) = setup_test(&env);
+
+    // Initialize contract
+    client.initialize(&admin);
+
+    // Create project
+    let project_id = client.create_project(
+        &owner,
+        &symbol_short!("TestProj"),
+        &1_000_000,
+        &token_client.address,
+    );
+
+    let _ = client.pause(&admin);
+
+    let is_pause = client.require_not_paused();
+    assert_eq!(is_pause, true);
+
+    let _ = client.unpause(&admin);
+
+    let is_pause = client.require_not_paused();
+    assert_eq!(is_pause, false);
+
+    // Deposit funds
+    let deposit_amount: i128 = 500_000;
+    client.deposit(&user, &project_id, &deposit_amount);
+
+    // Verify balance
+    assert_eq!(client.get_balance(&project_id), deposit_amount);
+
+    // Verify project data updated
+    let project = client.get_project(&project_id);
+    assert_eq!(project.total_deposited, deposit_amount);
+}
