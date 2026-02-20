@@ -238,7 +238,7 @@ class PostgresService:
                     current_value=trend_data["current_value"],
                     previous_value=trend_data["previous_value"],
                     change_percentage=trend_data["change_percentage"],
-                    metadata=trend_data.get("metadata"),
+                    extra_data=trend_data.get("extra_data") or trend_data.get("metadata"),
                 )
                 session.add(trend)
                 session.flush()
@@ -275,7 +275,7 @@ class PostgresService:
                         current_value=trend_data["current_value"],
                         previous_value=trend_data["previous_value"],
                         change_percentage=trend_data["change_percentage"],
-                        metadata=trend_data.get("metadata"),
+                        extra_data=trend_data.get("extra_data") or trend_data.get("metadata"),
                     )
                     session.add(trend)
                     saved_count += 1

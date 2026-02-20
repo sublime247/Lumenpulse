@@ -5,7 +5,7 @@ Database models for analytics data persistence
 from datetime import datetime
 from typing import Optional
 from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, Text, Index
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
 
 Base = declarative_base()
@@ -74,8 +74,8 @@ class AssetTrend(Base):
     previous_value = Column(Float, nullable=False)
     change_percentage = Column(Float, nullable=False)
     
-    # Metadata
-    metadata = Column(JSON, nullable=True)  # Additional trend metadata
+    # Additional data (renamed from metadata to avoid SQLAlchemy conflict)
+    extra_data = Column(JSON, nullable=True)  # Additional trend metadata
     
     # Timestamps
     timestamp = Column(

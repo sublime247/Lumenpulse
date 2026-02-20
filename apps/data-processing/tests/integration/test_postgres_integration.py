@@ -108,7 +108,7 @@ class TestPostgresIntegration:
             "current_value": 100.0,
             "previous_value": 90.0,
             "change_percentage": 11.11,
-            "metadata": {"confidence": "high"},
+            "extra_data": {"confidence": "high"},
         }
         
         trend = db_service.save_asset_trend(

@@ -37,7 +37,7 @@ Stores calculated trends for assets and metrics:
 - `score`: Trend strength/score
 - `current_value`, `previous_value`: Values for comparison
 - `change_percentage`: Percentage change
-- `metadata`: JSON for additional trend data
+- `extra_data`: JSON for additional trend data
 - `timestamp`, `created_at`: Timestamps
 
 **Indexes:**
@@ -255,7 +255,7 @@ CREATE TABLE asset_trends (
     current_value FLOAT NOT NULL,
     previous_value FLOAT NOT NULL,
     change_percentage FLOAT NOT NULL,
-    metadata JSON,
+    extra_data JSON,
     timestamp TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
