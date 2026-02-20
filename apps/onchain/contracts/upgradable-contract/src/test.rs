@@ -11,8 +11,7 @@ use soroban_sdk::{
 // The compiled contract WASM is embedded for tests that require WASM-level
 // behaviour: real upgrade execution and on-chain event emission.
 // ---------------------------------------------------------------------------
-const CONTRACT_WASM: &[u8] =
-    include_bytes!("../../../target/wasm32-unknown-unknown/release/upgradable_contract.wasm");
+const CONTRACT_WASM: &[u8] = include_bytes!("./mock/upgradable_contract.wasm");
 
 /// Register the contract *natively* (no WASM VM).
 /// Instance storage persists between calls. Fast.
